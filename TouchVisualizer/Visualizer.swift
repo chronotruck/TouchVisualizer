@@ -158,16 +158,11 @@ extension Visualizer {
                 view.beginTouch()
                 view.center = touch.location(in: topWindow)
                 topWindow.addSubview(view)
-                log(touch)
             case .moved:
                 if let view = findTouchView(touch) {
                     view.center = touch.location(in: topWindow)
                 }
-                
-                log(touch)
-            case .stationary:
-                log(touch)
-            case .ended, .cancelled:
+			case .ended, .cancelled:
                 if let view = findTouchView(touch) {
                     UIView.animate(withDuration: 0.2, delay: 0.0, options: .allowUserInteraction, animations: { () -> Void  in
                         view.alpha = 0.0
@@ -177,9 +172,12 @@ extension Visualizer {
                         self.log(touch)
                     })
                 }
-                
-                log(touch)
-            }
+			case .stationary, .regionEntered, .regionMoved, .regionExited:
+				break
+			@unknown default:
+				break
+			}
+			log(touch)
         }
     }
 }
@@ -212,7 +210,11 @@ extension Visualizer {
             case .stationary: phase = "S"
             case .ended: phase = "E"
             case .cancelled: phase = "C"
-            }
+			case .regionEntered: phase = "REN"
+			case .regionMoved: phase = "RM"
+			case .regionExited: phase = "REX"
+			@unknown default: phase = "U"
+			}
             
             let x = String(format: "%.02f", view.center.x)
             let y = String(format: "%.02f", view.center.y)
